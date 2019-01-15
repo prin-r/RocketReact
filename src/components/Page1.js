@@ -10,16 +10,17 @@ const Page1 = () => {
     const [rot, setRot] = useState(0);
     
     useEffect(() => {
-        setRot(rot+0.002);
+        setRot(rot+0.002 > 360.0 ? rot+0.002-360.0 : rot+0.002);
     });
 
     return (
         <div>
             <center>
                 <img src={!isPressed ? circleButton : buttonDesat}
-                    style={{width: '75%', position: 'absolute', left: '12.5%', top: '10%', zIndex: '1'}}
-                    onTouchStart={() => setPressed(true)}
-                    onTouchEnd={() => setPressed(false)}
+                    style={{width: '75%',position: 'absolute', left: '12.5%', top: '10%', zIndex: '1'}}
+                    onContextMenu={ (e) => { e.preventDefault(); }}
+                    onTouchStart={ () => setPressed(true) }
+                    onTouchEnd={ () => setPressed(false) }
                 />
 
                 <img src={auraButton} style={{width: '75%', position: 'absolute', left: '12.5%', top: '10%', transform: `rotate(${rot}deg)`}}/>
