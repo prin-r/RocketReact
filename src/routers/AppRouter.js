@@ -9,11 +9,6 @@ const Page1 = Loadable({
     loading: () => loading
 });
 
-const Page2 = Loadable({
-    loader: () => import('../components/Page2'),
-    loading: () => loading
-});
-
 const NotFound = Loadable({
     loader: () => import('../components/NotFound'),
     loading: () => loading
@@ -24,7 +19,6 @@ const AppRouter = () => (
         <div>
             <Switch>
                 <Route path="/page1" component={Page1} />
-                <Route path="/page2" component={Page2} />
                 <Route path="/NotFound" component={NotFound} />
             </Switch>
         </div>
