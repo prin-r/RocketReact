@@ -1,31 +1,43 @@
 import React , { useState , useEffect } from 'react';
-import circleButton from '../../public/button.png';
-import auraButton from '../../public/auraButton.png';
-import buttonDesat from '../../public/buttonDesat.png'
-import launchText from '../../public/text.png';
+import { rgbToHex } from '../utils/ColorConversion';
+import ImageDisplay from './ImageDisplay';
+import ColorBox from './ColorBox';
 
 const Page1 = () => {
 
-    const [isPressed, setPressed] = useState(false);
-    const [rot, setRot] = useState(0);
+    const [selectedColor, setSelectedColor] = useState(undefined);
+    const [numColors, setNumColors] = useState(5);
+    const [colors, setColors] = useState([]);
     
     useEffect(() => {
-        setRot(rot+0.002 > 360.0 ? rot+0.002-360.0 : rot+0.002);
-    });
+        setColors((Array.apply(null, Array(numColors))).map((_, i) => {
+            const val = (i * 255) / numColors;
+            return [val,val,val];
+        }));
+    } , []);
 
     return (
         <div>
-            <center>
-                <img src={!isPressed ? circleButton : buttonDesat}
-                    style={{width: '75%',position: 'absolute', left: '12.5%', top: '10%', zIndex: '1'}}
-                    onContextMenu={ (e) => { e.preventDefault(); }}
-                    onTouchStart={ () => setPressed(true) }
-                    onTouchEnd={ () => setPressed(false) }
-                />
-
-                <img src={auraButton} style={{width: '75%', position: 'absolute', left: '12.5%', top: '10%', transform: `rotate(${rot}deg)`}}/>
-                <img src={launchText} style={{width: '75%', position: 'absolute', left: '12.5%', bottom: '20%'}}/>
-            </center>
+            <ImageDisplay setColors={setColors} numColors={numColors}/>
+            <div style={{'margin-left': 'auto', 'margin-right': 'auto', width: '50%'}}>
+            <div>
+                {colors.map(color => <ColorBox color={color} isSelected={selectedColor === color} numColors={numColors} setColor={setSelectedColor}/>)}
+            </div>
+            <p> {selectedColor && `selected color is ${rgbToHex(...selectedColor)}`}</p>
+            <span>
+                <button 
+                    onClick={ async () => setNumColors(numColors > 3 ? numColors - 1: numColors)}
+                    style={{display: 'inline-block'}}
+                >
+                {'less colors'}</button>
+                <p style={{display: 'inline-block'}}> number of colors is {numColors} </p>
+                <button 
+                    onClick={ async () => setNumColors(numColors < 10 ? numColors + 1: numColors)}
+                    style={{display: 'inline-block'}}
+                >
+                {'more colors'}</button>
+            </span>
+            </div>
         </div>
     );
 }

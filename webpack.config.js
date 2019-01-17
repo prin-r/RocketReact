@@ -6,7 +6,7 @@ module.exports = (env) => {
     console.log('isProduction : ',isProduction);
     return {
         mode: env,
-        entry: './src/App.js',
+        entry: ['babel-polyfill','./src/App.js'],
         output: {
             path: path.join(__dirname, 'public'),
             filename: 'dist/bundle.js',
