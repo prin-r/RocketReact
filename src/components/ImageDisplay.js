@@ -1,16 +1,15 @@
 import React , { useState , useEffect } from 'react';
 import mediancut from '../utils/ColorQuantizations';
 
-const ImageDisplay = ({ setColors , numColors }) => {
+const ImageDisplay = ({ setColors , numColors , setColorsDefault }) => {
 
     const [imageData, setImageData] = useState(undefined);
 
     useEffect(() => {
-        if (imageData != undefined) {
-            const result = mediancut(imageData, numColors);
-            setColors(result);
-        }
+        ;(async () => setColors(createColorsSet(imageData)))();
     } , [numColors]);
+
+    const createColorsSet = data => data ? mediancut(data, numColors) : setColorsDefault();
 
     const handleImage = async e => {
         const reader = new FileReader();
@@ -19,28 +18,29 @@ const ImageDisplay = ({ setColors , numColors }) => {
         const [sw, hw] = [window.innerWidth , window.innerHeight];
         reader.onload = async event => {
             const img = new Image();
-            img.onload = () => {
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-                const newImageData = ctx.getImageData(0, 0, img.width, img.height).data;
-                const result = mediancut(newImageData, numColors);
-                setColors(result);
-                setImageData(newImageData);
-                canvas.width = sw;
-                canvas.height = (sw * img.height) / img.width;
-                ctx.drawImage(img, 0, 0, sw, (sw * img.height) / img.width);
-            }
+            img.onload = async () => {
+                await new Promise((resolve, reject) => {
+                    let [cw, ch] = [sw , (sw * img.height) / img.width];
+                    [canvas.width, canvas.height] = (ch > hw / 2) ? [(hw / 2) * (cw / ch), hw / 2]:[cw, ch];
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const newImageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                    setImageData(newImageData);
+                    const result = createColorsSet(newImageData);
+                    setColors(result);
+                    resolve(result);
+                });
+            };
             img.src = event.target.result;
         };
-        reader.readAsDataURL(e.target.files[0]);
+        const file = e.target.files[0];
+        file && file.type.match('image.*') && reader.readAsDataURL(file);
     };
 
     return (
-        <div style={{'margin-top': '20px', 'margin-bottom':'20px'}}>
-            <canvas id="imageCanvas" style={{'margin-top': '20px', 'margin-bottom':'20px'}}></canvas>
-            <br></br>
+        <div style={{'margin-bottom':'20px', 'margin-left': 'auto', 'margin-right':'auto'}}>
             <center>
+                <canvas id="imageCanvas" style={{'margin-bottom':'20px'}}></canvas>
+                <br></br>
                 <input type="file" id="imageLoader" name="imageLoader" onChange={handleImage}/>
             </center>
         </div>

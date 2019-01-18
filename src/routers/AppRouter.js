@@ -4,8 +4,8 @@ import { BrowserRouter, Route, Switch } from 'react-router-dom';
 
 const loading = (<div>...loading</div>);
 
-const Page1 = Loadable({
-    loader: () => import('../components/Page1'),
+const Page = Loadable({
+    loader: () => import('../components/Page'),
     loading: () => loading
 });
 
@@ -18,8 +18,8 @@ const AppRouter = () => (
     <BrowserRouter>
         <div>
             <Switch>
-                <Route path="/page1" component={Page1} />
-                <Route path="/NotFound" component={NotFound} />
+                <Route path="/page" component={Page} />
+                <Route component={NotFound} />
             </Switch>
         </div>
     </BrowserRouter>
