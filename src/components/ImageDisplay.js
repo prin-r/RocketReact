@@ -37,13 +37,12 @@ const ImageDisplay = ({ setColors , numColors , setColorsDefault }) => {
     };
 
     return (
-        <div style={{'margin-bottom':'20px', 'margin-left': 'auto', 'margin-right':'auto'}}>
-            <center>
-                <canvas id="imageCanvas" style={{'margin-bottom':'20px'}}></canvas>
-                <br></br>
-                <input type="file" id="imageLoader" name="imageLoader" onChange={handleImage}/>
-            </center>
-        </div>
+        <center>
+            <canvas id="imageCanvas"></canvas>
+            <div style={{margin: 'auto', height: '10%'}}>
+                <input type="file" id="imageLoader" onChange={handleImage}/>
+            </div>
+        </center>
     );
 };
 
