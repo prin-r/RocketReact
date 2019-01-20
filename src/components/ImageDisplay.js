@@ -1,29 +1,27 @@
-import React , { useState , useEffect } from 'react';
+import React , { useState , useEffect , useRef } from 'react';
 import mediancut from '../utils/ColorQuantizations';
 
 const ImageDisplay = ({ setColors , numColors , setColorsDefault }) => {
 
     const [imageData, setImageData] = useState(undefined);
+    const canvas = useRef(null);
 
-    useEffect(() => {
-        ;(async () => setColors(createColorsSet(imageData)))();
-    } , [numColors]);
+    useEffect(() => (async () => setColors(createColorsSet(imageData)))(), [numColors]);
 
     const createColorsSet = data => data ? mediancut(data, numColors) : setColorsDefault();
 
     const handleImage = async e => {
         const reader = new FileReader();
-        const canvas = document.getElementById('imageCanvas');
-        const ctx = canvas.getContext('2d');
+        const [cc, ctx] = [canvas.current, canvas.current.getContext('2d')];
         const [sw, hw] = [window.innerWidth , window.innerHeight];
         reader.onload = async event => {
             const img = new Image();
             img.onload = async () => {
                 await new Promise((resolve, reject) => {
-                    let [cw, ch] = [sw , (sw * img.height) / img.width];
-                    [canvas.width, canvas.height] = (ch > hw / 2) ? [(hw / 2) * (cw / ch), hw / 2]:[cw, ch];
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const newImageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                    const [cw, ch] = [sw , (sw * img.height) / img.width];
+                    [cc.width, cc.height] = (ch > hw / 2) ? [(hw / 2) * (cw / ch), hw / 2]:[cw, ch];
+                    ctx.drawImage(img, 0, 0, cc.width, cc.height);
+                    const newImageData = ctx.getImageData(0, 0, cc.width, cc.height).data;
                     setImageData(newImageData);
                     const result = createColorsSet(newImageData);
                     setColors(result);
@@ -38,7 +36,7 @@ const ImageDisplay = ({ setColors , numColors , setColorsDefault }) => {
 
     return (
         <center>
-            <canvas id="imageCanvas"></canvas>
+            <canvas ref={canvas}></canvas>
             <div style={{margin: 'auto', height: '10%'}}>
                 <input type="file" id="imageLoader" onChange={handleImage}/>
             </div>
